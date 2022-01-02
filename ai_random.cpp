@@ -24,7 +24,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "info.h"
 #include "random.h"
 
-Action AIRandom::doTurn(const Info& info)
+Action AIRandom::doTurn(const Info& info, const Stats& stats)
 {
   (void)info;
 

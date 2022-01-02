@@ -29,7 +29,7 @@ class AIRandom : public AI
 {
   public:
 
-    virtual Action doTurn(const Info& info);
+    virtual Action doTurn(const Info& info, const Stats& stats);
     virtual bool boastCards(const Info& info);
 
     virtual std::string getAIName();

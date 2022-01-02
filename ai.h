@@ -23,6 +23,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "action.h"
+#include "stats.h"
 
 struct Event;
 struct Info;
@@ -37,7 +38,7 @@ class AI //interface class, used for bots, but also for human players (then the 
     doTurn:
     make a decision for this turn: fold, check, call or raise?
     */
-    virtual Action doTurn(const Info& info) = 0;
+    virtual Action doTurn(const Info& info, const Stats& stats) = 0;
 
     /*
     onEvent:

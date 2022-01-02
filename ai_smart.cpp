@@ -28,12 +28,12 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-AISmart::AISmart(double tightness)
-: tightness(tightness)
+AISmart::AISmart(double tightnessP)
 {
+  tightness = tightnessP;
 }
 
-Action AISmart::doTurn(const Info& info)
+Action AISmart::doTurn(const Info& info, const Stats& stats)
 {
   /*
   The "Smart" AI tries to win by playing with good cards and folding with bad cards.

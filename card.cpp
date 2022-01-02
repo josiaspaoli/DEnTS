@@ -21,13 +21,12 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "card.h"
-#include "os.h"
 
 // TODO: this setting belongs more in io_terminal
 // CARDPRINTMODE: 0=letters (cdhs), 1=windows symbols (ascii), 2=linux symbols (unicode)
-#if defined(OS_WINDOWS)
+#if defined(_WIN32)
 int CARDPRINTMODE = 1;
-#elif defined(OS_LINUX)
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
 // Requires linux terminal set to UTF-8
 int CARDPRINTMODE = 2;
 //int CARDPRINTMODE = 0;
@@ -245,10 +244,14 @@ std::string Card::getShortNameAscii() const
 {
   std::string s = getShortName();
   std::string result = s;
-  if(s[1] == 'h') result[1] = '\3';
-  else if(s[1] == 'd') result[1] = '\4';
-  else if(s[1] == 'c') result[1] = '\5';
-  else if(s[1] == 's') result[1] = '\6';
+  //if(s[1] == 'h') result[1] = '\3';
+  //else if(s[1] == 'd') result[1] = '\4';
+  //else if(s[1] == 'c') result[1] = '\5';
+  //else if(s[1] == 's') result[1] = '\6';
+  if(s[1] == 'h') result[1] = 'h';
+  else if(s[1] == 'd') result[1] = 'd';
+  else if(s[1] == 'c') result[1] = 'c';
+  else if(s[1] == 's') result[1] = 's';
   else result += "?";
   return result;
 }
@@ -258,10 +261,14 @@ std::string Card::getShortNameUnicode() const
   std::string s = getShortName();
   std::string result;
   result += s[0];
-  if(s[1] == 's') result += "\u2660";
-  else if(s[1] == 'h') result += "\u2665";
-  else if(s[1] == 'd') result += "\u2666";
-  else if(s[1] == 'c') result += "\u2663";
+  //if(s[1] == 's') result += "\u2660";
+  //else if(s[1] == 'h') result += "\u2665";
+  //else if(s[1] == 'd') result += "\u2666";
+  //else if(s[1] == 'c') result += "\u2663";
+  if(s[1] == 'h') result[1] = 'h';
+  else if(s[1] == 'd') result[1] = 'd';
+  else if(s[1] == 'c') result[1] = 'c';
+  else if(s[1] == 's') result[1] = 's';
   else result += "?";
   return result;
 }

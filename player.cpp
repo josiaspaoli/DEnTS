@@ -55,9 +55,9 @@ std::string Player::getAIName() const
   return ai->getAIName();
 }
 
-Action Player::doTurn(const Info& info)
+Action Player::doTurn(const Info& info, const Stats& stats)
 {
-  return ai->doTurn(info);
+  return ai->doTurn(info, stats);
 }
 
 bool Player::isAllIn() const

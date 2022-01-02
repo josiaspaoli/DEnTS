@@ -39,6 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "pokereval.h"
 
+#include <algorithm>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -2038,12 +2039,6 @@ namespace PokerEval
   static const int ONE_PAIR = 8;
   static const int HIGH_CARD = 9;
 
-  template<typename T>
-  T __min(T a, T b)
-  {
-    return a < b ? a : b;
-  }
-
   #define RANK(x)  ((x >> 8) & 0xF)
 
   std::string value_str[] = {
@@ -2310,11 +2305,11 @@ namespace PokerEval
       // if 6 cards I would like to find HandRank for them
       // Cactus Key is 1 = highest - 7362 lowest I need to get the min for the permutations
      case 6 :  holdrank = eval_5hand_fast(workcards[0],workcards[1],workcards[2],workcards[3],workcards[4]);
-      holdrank = __min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[2],workcards[3],workcards[5]));
-      holdrank = __min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[2],workcards[4],workcards[5]));
-      holdrank = __min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[3],workcards[4],workcards[5]));
-      holdrank = __min(holdrank, eval_5hand_fast(workcards[0],workcards[2],workcards[3],workcards[4],workcards[5]));
-      holdrank = __min(holdrank, eval_5hand_fast(workcards[1],workcards[2],workcards[3],workcards[4],workcards[5]));
+      holdrank = std::min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[2],workcards[3],workcards[5]));
+      holdrank = std::min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[2],workcards[4],workcards[5]));
+      holdrank = std::min(holdrank, eval_5hand_fast(workcards[0],workcards[1],workcards[3],workcards[4],workcards[5]));
+      holdrank = std::min(holdrank, eval_5hand_fast(workcards[0],workcards[2],workcards[3],workcards[4],workcards[5]));
+      holdrank = std::min(holdrank, eval_5hand_fast(workcards[1],workcards[2],workcards[3],workcards[4],workcards[5]));
       break;
      case 7 : holdrank = eval_7hand(workcards);
       break;

@@ -26,6 +26,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "action.h"
 #include "event.h"
+#include "stats.h"
 
 class AI;
 struct Info;
@@ -72,7 +73,7 @@ struct Player
   std::string getName() const; //min 1 letter,
   std::string getAIName() const;
 
-  Action doTurn(const Info& info);
+  Action doTurn(const Info& info, const Stats& stats);
   void onEvent(const Event& event);
 
   bool isAllIn() const;

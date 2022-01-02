@@ -23,7 +23,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "ai_raise.h"
 #include "info.h"
 
-Action AIRaise::doTurn(const Info& info)
+Action AIRaise::doTurn(const Info& info, const Stats& stats)
 {
   (void)info;
 

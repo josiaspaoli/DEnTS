@@ -29,10 +29,10 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 
 ObserverLog::ObserverLog(const std::string& logFileName)
 {
-  logfile.open(logFileName.c_str(), std::ios::app);
+  logfile.open(logFileName.c_str()/*, std::ios::app*/);
 
-  //logfile << std::endl << std::endl << "======================OOPoker Log=======================" << std::endl << std::endl;
-  s += "\n\n======================OOPoker Log=======================\n\n";
+  logfile << std::endl << std::endl << "======================OOPoker Log=======================" << std::endl << std::endl;
+  //s += "\n\n======================OOPoker Log=======================\n\n";
 
   s += "Date: " + getDateString() + "\n\n";
 }
@@ -46,7 +46,7 @@ ObserverLog::~ObserverLog()
 
 void ObserverLog::onEvent(const Event& event)
 {
-  //logfile << eventToString(event) << std::endl;
+  logfile << eventToString(event) << std::endl;
   s += eventToString(event) + "\n";
 
   if(s.size() > 1000000) //not sure if this has a point or not, but I don't want it to access disk non-stop all the time, only write every million characters.

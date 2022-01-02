@@ -25,6 +25,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 
 #include "info.h"
+#include "stats.h"
 
 
 //forward declarations
@@ -33,6 +34,7 @@ class Table;
 struct Player;
 class Observer;
 struct Event;
+struct Stats;
 
 void makeInfo(Info& info, const Table& table, const Rules& rules, int playerViewPoint);
 
@@ -54,13 +56,13 @@ class Game
     int numDeals; //how much deals are done since the game started
 
     Rules rules;
-    
+
     Info infoForPlayers; //this is to speed up the game a lot, by not recreating the Info object everytime
 
   protected:
-    void settleBets(Table& table, Rules& rules);
+    void settleBets(Table& table, Rules& rules, Stats& stats);
     void kickOutPlayers(Table& table);
-    void declareWinners(Table& table);
+    void declareWinners(Table& table, Stats& stats);
     void sendEvents(Table& table);
     const Info& getInfoForPlayers(Table& table, int viewPoint = -1); //rather heavy-weight function! Copies entire Info object.
 
@@ -70,12 +72,13 @@ class Game
     ~Game();
 
     //The Game class will take care of deleting the AI's and observers in its desctructor.
+
     void addPlayer(const Player& player);
     void addObserver(Observer* observer);
     void setRules(const Rules& rules);
 
-    void runTable(Table& table);
+    void runTable(Table& table, Stats& stats);
 
-    void doGame();
+    void doGame(Stats& stats);
 };
 

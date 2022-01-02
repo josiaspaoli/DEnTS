@@ -31,7 +31,7 @@ class AIBlindLimp: public AI
 
   public:
 
-    virtual Action doTurn(const Info& info);
+    virtual Action doTurn(const Info& info, const Stats& stats);
 
     virtual std::string getAIName();
 };

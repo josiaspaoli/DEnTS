@@ -23,7 +23,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "ai_call.h"
 #include "info.h"
 
-Action AICall::doTurn(const Info& info)
+Action AICall::doTurn(const Info& info, const Stats& stats)
 {
   return info.getCallAction();
 }

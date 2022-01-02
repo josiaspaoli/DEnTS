@@ -23,12 +23,12 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "io_terminal.h"
 
 #include "event.h"
+#include "mex.h"
 #include "table.h"
 #include "info.h"
-#include "os.h"
 
 
-#if defined(OS_WINDOWS)
+#if defined(_WIN32)
 
 
 #include <conio.h>
@@ -89,8 +89,7 @@ std::string getDateString()
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// TODO: OS_UNKNOWN may not have headers termios.h, unistd.h or fcntl.h, provide alternative implementation
-#elif defined(OS_LINUX) || defined(OS_UNKNOWN)
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
 
 #include <iostream>
 #include <string>
@@ -402,7 +401,11 @@ std::string getTableAsciiArt(const Info& info)
 
 void drawTable(const Info& info)
 {
-  std::cout << getTableAsciiArt(info) << std::endl;
+  //std::cout << getTableAsciiArt(info) << std::endl;
+  mexPrintf("\n\n");
+  mexPrintf(getTableAsciiArt(info).c_str());
+  mexPrintf("\n");
+  mexEvalString("drawnow;");
 }
 
 

@@ -31,9 +31,9 @@ class AISmart : public AI
 
   public:
 
-    AISmart(double tightness = 0.8);
+    AISmart(double);
 
-    virtual Action doTurn(const Info& info);
+    virtual Action doTurn(const Info& info, const Stats& stats);
 
     virtual std::string getAIName();
 };

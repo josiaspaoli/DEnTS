@@ -46,6 +46,7 @@ for his/her enjoyment.
 #include "ai_call.h"
 #include "ai_checkfold.h"
 #include "ai_human.h"
+#include "ai_my_bot.h"
 #include "ai_raise.h"
 #include "ai_random.h"
 #include "ai_smart.h"
@@ -61,18 +62,35 @@ for his/her enjoyment.
 #include "observer_log.h"
 #include "pokermath.h"
 #include "random.h"
+#include "stats.h"
 #include "table.h"
 #include "tools_terminal.h"
 #include "unittest.h"
 #include "util.h"
 
-// returns whether user wants to quit
-bool doGame()
+
+void mexFunction(int nlhs, mxArray *plhs[],
+                int nrhs, const mxArray *prhs[])
 {
-  std::cout << "Welcome to OOPoker\nCopyright (c) 2010-2019 Lode Vandevenne" << std::endl << std::endl;
 
+  int bS;
+  double *ptrPlayers;
+  double *ptrhistoric;
+  double *ptrtightness;
+  size_t nPlayers;
+  char *str;
+  mwSize index;
+  mwSize elements = mxGetNumberOfElements(prhs[0]);
+
+  ptrhistoric = mxGetPr(prhs[0]);
+  bS = (int)mxGetScalar(prhs[1]);
+  ptrPlayers = mxGetPr(prhs[2]);
+  nPlayers = mxGetN(prhs[2]);
+  ptrtightness = mxGetPr(prhs[3]);
+  str = mxArrayToString(prhs[4]);
+
+  /*
   char c = 0;
-
 
   std::cout << "Choose Game Type\n\
 1: human + AI's\n\
@@ -81,8 +99,7 @@ bool doGame()
 4: AI battle heads-up\n\
 r: random game (human)\n\
 c: calculator\n\
-u: unit test\n\
-q: quit" << std::endl;
+u: unit test" << std::endl;
   c = getChar();
   int gameType = 1;
   if(c == '1') gameType = 1;
@@ -92,118 +109,42 @@ q: quit" << std::endl;
   else if(c == 'r') gameType = 5;
   else if(c == 'c')
   {
-    std::cout << "Choose Calculator\n1: Pot Equity\n2: Showdown" << std::endl;
+
+    std::cout << "Choose Calculator\n\
+1: Pot Equity\n\
+2: Showdown" << std::endl;
 
     char c2 = getChar();
     if(c2 == '1') runConsolePotEquityCalculator();
     else runConsoleShowdownCalculator();
-    return false;
+    return;
   }
   else if(c == 'u')
   {
     doUnitTest();
-    return false;
+    return;
   }
-  else if(c == 'q') return true;
-
+  else if(c == 'q') return;
+  */
 
   Rules rules;
   rules.buyIn = 1000;
   rules.bigBlind = 10;
   rules.ante = 0;
   rules.allowRebuy = false;
-  rules.fixedNumberOfDeals = 100;
-
-  std::cout << std::endl << std::endl;
-
-  std::cout << "Choose Game Win Condition\n\
-1: last remaining (no rebuys)\n\
-2: rebuys, fixed 100 deals\n\
-3: rebuys, fixed 1000 deals\n\
-4: rebuys, fixed 10000 deals\n\
-c: rebuys, fixed custom amount of deals" << std::endl;
-  c = getChar();
-  if(c == '1') { rules.allowRebuy = false; rules.fixedNumberOfDeals = 0; }
-  else if(c == '2') { rules.allowRebuy = true; rules.fixedNumberOfDeals = 100; }
-  else if(c == '3') { rules.allowRebuy = true; rules.fixedNumberOfDeals = 1000; }
-  else if(c == '4') { rules.allowRebuy = true; rules.fixedNumberOfDeals = 10000; }
-  else if(c == 'c')
-  {
-    std::string s;
-
-    std::cout << "enter number of deals: ";
-    s = getLine();
-
-    rules.allowRebuy = true;
-    rules.fixedNumberOfDeals = strtoval<int>(s);
-  }
-  else if(c == 'q') return false;
-
-  std::cout << std::endl << std::endl;
+  rules.fixedNumberOfDeals = 0;
 
   HostTerminal host;
   Game game(&host);
 
-  if(gameType != 5)
-  {
-    std::cout << "choose betting structure (buy-in, small, big)\n\
-1: 1000, 5, 10\n\
-2: 1000, 10, 20\n\
-3: 1000, 50, 100\n\
-4: 1000, 100, 200\n\
-5: 100000, 5, 10\n\
-6: 100000, 10, 20\n\
-7: 100000, 50, 100\n\
-8: 100000, 100, 200\n\
-9: 1000, 5, 10, ante 1\n\
-c: custom" << std::endl;
-    c = getChar();
-    if(c == '1')      {rules.buyIn = 1000; rules.smallBlind = 5; rules.bigBlind = 10; rules.ante = 0; }
-    else if(c == '2') {rules.buyIn = 1000; rules.smallBlind = 10; rules.bigBlind = 20; rules.ante = 0; }
-    else if(c == '3') {rules.buyIn = 1000; rules.smallBlind = 50; rules.bigBlind = 100; rules.ante = 0; }
-    else if(c == '4') {rules.buyIn = 1000; rules.smallBlind = 100; rules.bigBlind = 200; rules.ante = 0; }
-    else if(c == '5') {rules.buyIn = 100000; rules.smallBlind = 5; rules.bigBlind = 10; rules.ante = 0; }
-    else if(c == '6') {rules.buyIn = 100000; rules.smallBlind = 10; rules.bigBlind = 20; rules.ante = 0; }
-    else if(c == '7') {rules.buyIn = 100000; rules.smallBlind = 50; rules.bigBlind = 100; rules.ante = 0; }
-    else if(c == '8') {rules.buyIn = 100000; rules.smallBlind = 100; rules.bigBlind = 200; rules.ante = 0; }
-    else if(c == '9') {rules.buyIn = 1000; rules.smallBlind = 5; rules.bigBlind = 10; rules.ante = 1; }
-    else if(c == 'c')
-    {
-      std::string s;
-
-      std::cout << "enter buy-in amount: ";
-      s = getLine();
-      rules.buyIn = strtoval<int>(s);
-
-      std::cout << "enter small blind: ";
-      s = getLine();
-      rules.smallBlind = strtoval<int>(s);
-
-      std::cout << "enter big blind: ";
-      s = getLine();
-      rules.bigBlind = strtoval<int>(s);
-
-      std::cout << "enter ante: ";
-      s = getLine();
-      rules.ante = strtoval<int>(s);
-
-    }
-    else if(c == 'q') return false;
-  }
-  else
-  {
-    if(getRandom() < 0.2)
-    {
-      rules.ante = getRandom(1, 5);
-    }
-    rules.bigBlind = getRandom(10, 200);
-    //make nice round number
-    rules.bigBlind = getNearestRoundNumber(rules.bigBlind);
-    rules.smallBlind = rules.bigBlind / 2;
-
-    rules.buyIn = getRandom(500, 200000);
-    rules.buyIn = getNearestRoundNumber(rules.buyIn);
-  }
+  if(bS == 1)      {rules.buyIn = 1000; rules.smallBlind = 5; rules.bigBlind = 10; rules.ante = 0; }
+  else if(bS == 2) {rules.buyIn = 1000; rules.smallBlind = 10; rules.bigBlind = 20; rules.ante = 0; }
+  else if(bS == 3) {rules.buyIn = 1000; rules.smallBlind = 50; rules.bigBlind = 100; rules.ante = 0; }
+  else if(bS == 4) {rules.buyIn = 1000; rules.smallBlind = 100; rules.bigBlind = 200; rules.ante = 0; }
+  else if(bS == 5) {rules.buyIn = 100000; rules.smallBlind = 5; rules.bigBlind = 10; rules.ante = 0; }
+  else if(bS == 6) {rules.buyIn = 100000; rules.smallBlind = 10; rules.bigBlind = 20; rules.ante = 0; }
+  else if(bS == 7) {rules.buyIn = 100000; rules.smallBlind = 50; rules.bigBlind = 100; rules.ante = 0; }
+  else if(bS == 8) {rules.buyIn = 100000; rules.smallBlind = 100; rules.bigBlind = 200; rules.ante = 0; }
 
   game.setRules(rules);
 
@@ -212,95 +153,38 @@ c: custom" << std::endl;
   std::vector<Player> players;
   std::vector<Observer*> observers;
 
-  game.addObserver(new ObserverLog("log.txt"));
-
-  if(gameType == 1) //Human + AI's
+  if (strlen(str) != 1)
   {
-    game.addPlayer(Player(new AIHuman(&host), "You"));
-
-    //choose the AI players here
-    game.addPlayer(Player(new AIRandom(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-  }
-  else if(gameType == 2) //Human + AI heads-up
-  {
-    game.addPlayer(Player(new AIHuman(&host), "You"));
-
-    //choose the AI player here
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-  }
-  else if(gameType == 3) //AI Battle
-  {
-    //game.addObserver(new ObserverTerminalQuiet());
-    game.addObserver(new ObserverTerminal());
-
-    //choose the AI players here (AISmart, AIRandom, AICall, ...)
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-
-    //for benchmarking game logic with only AICall bots
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-    //game.addPlayer(Player(new AICall(), getRandomName()));
-
-  }
-  else if(gameType == 4) //AI heads-up
-  {
-    game.addObserver(new ObserverTerminalQuiet());
-
-    //choose two AI players here
-    game.addPlayer(Player(new AIRandom(), getRandomName()));
-    game.addPlayer(Player(new AISmart(), getRandomName()));
-  }
-  else if(gameType == 5) //random game (human)
-  {
-    game.addPlayer(Player(new AIHuman(&host), "You"));
-
-    size_t num = getRandom(1, 9);
-    for(size_t i = 0; i < num; i++)
-    {
-      game.addPlayer(Player(getRandom() < 0.1 ? (AI*)(new AIRandom()) : (AI*)(new AISmart()), getRandomName()));
-    }
+    game.addObserver(new ObserverLog(str));
   }
 
-  game.doGame();
-  return false;
+  for (size_t i=0; i < nPlayers; i++)
+  {
+    if((int)ptrPlayers[i] == 1)        {game.addPlayer(Player(new AISmart(ptrtightness[i]), getRandomName()));}
+    else if((int)ptrPlayers[i] == 2)   {game.addPlayer(Player(new AIRandom(), getRandomName())); }
+    else if((int)ptrPlayers[i] == 3)   {game.addPlayer(Player(new AICheckFold(), getRandomName())); }
+    else if((int)ptrPlayers[i] == 4)   {game.addPlayer(Player(new AICall(), getRandomName())); }
+    else if((int)ptrPlayers[i] == 5)   {game.addPlayer(Player(new AIBlindLimp(), getRandomName())); }
+    else if((int)ptrPlayers[i] == 6)   {game.addPlayer(Player(new AIRaise(), getRandomName())); }
+    else if((int)ptrPlayers[i] == 7)   {game.addPlayer(Player(new AIHuman(&host, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 11)  {game.addPlayer(Player(new AIMyBot(1, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 21)  {game.addPlayer(Player(new AIMyBot(2, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 31)  {game.addPlayer(Player(new AIMyBot(3, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 41)  {game.addPlayer(Player(new AIMyBot(4, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 51)  {game.addPlayer(Player(new AIMyBot(5, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 61)  {game.addPlayer(Player(new AIMyBot(6, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 71)  {game.addPlayer(Player(new AIMyBot(7, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 81)  {game.addPlayer(Player(new AIMyBot(8, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 91)  {game.addPlayer(Player(new AIMyBot(9, (int)nPlayers), getRandomName())); }
+    else if((int)ptrPlayers[i] == 101) {game.addPlayer(Player(new AIMyBot(10, (int)nPlayers), getRandomName())); }
+  }
+
+  Stats stats(nPlayers, ptrhistoric, elements, players);
+
+  game.doGame(stats);
+
+  plhs[0] = stats.standings;
+  plhs[1] = stats.hist;
+  plhs[2] = stats.deals;
+
 }
-
-
-int main()
-{
-  for(;;) {
-    bool quit = doGame();
-    if(quit) break;
-  }
-
-#if defined(OS_WINDOWS)
-  //prevent closing terminal window in Windows, since that prevents seeing the result.
-  //in Linux, this is not necessary since Linux keeps the terminal window open if a program in it quits.
-  pressAnyKey();
-#endif
-
-  return 0;
-}
-

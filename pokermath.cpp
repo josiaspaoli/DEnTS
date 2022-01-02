@@ -1137,7 +1137,8 @@ bool getWinChanceWithKnownHands(std::vector<double>& win, std::vector<double>& t
 
   double exhaustiveSamples = combination(numOther, numUnknown) + 0.5; //avoid rounding errors
 
-  int val[numPlayers];
+  //int val[numPlayers];
+  int* val = new int[numPlayers];
 
   int count = 0;
 

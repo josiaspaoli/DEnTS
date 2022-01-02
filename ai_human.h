@@ -37,9 +37,20 @@ class AIHuman : public AI
 
   public:
 
-    AIHuman(HostTerminal* host);
+    double *ptrcartas;
+    double *ptrdados;
+    double *ptrestado;
 
-    virtual Action doTurn(const Info& info);
+    mxArray *mae[4];
+    mxArray *cartas;
+    mxArray *dados;
+    mxArray *estado;
+
+    mxArray *p[1];
+
+    AIHuman(HostTerminal* host, int);
+
+    virtual Action doTurn(const Info& info, const Stats& stats);
     virtual void onEvent(const Event& event);
     virtual bool boastCards(const Info& info);
 

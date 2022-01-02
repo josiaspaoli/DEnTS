@@ -34,6 +34,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "observer_statkeeper.h"
 #include "player.h"
 #include "pokermath.h"
+#include "stats.h"
 #include "table.h"
 #include "util.h"
 
@@ -43,7 +44,7 @@ void makeInfo(Info& info, const Table& table, const Rules& rules, int playerView
   info.current = table.current;
   info.dealer = table.dealer;
   info.minRaiseAmount = table.lastRaiseAmount;
-  
+
   info.boardCards.clear();
 
   if(table.round >= R_FLOP)
@@ -443,10 +444,16 @@ Game::~Game()
 }
 
 //returns false if player wants to quit
-void Game::settleBets(Table& table, Rules& rules)
+void Game::settleBets(Table& table, Rules& rules, Stats& stats)
 {
   (void)rules;
-  
+
+  int i = -1;
+  int j = -1;
+  int k = -1;
+
+  int numChecks;
+
   table.lastRaiser = -1;
   int prev_current = -1; //the previous current player (used to detect when bets are settled)
 
@@ -466,7 +473,7 @@ void Game::settleBets(Table& table, Rules& rules)
 
     Player& player = table.players[table.current];
 
-    Action action = player.doTurn(getInfoForPlayers(table, table.current));
+    Action action = player.doTurn(getInfoForPlayers(table, table.current), stats);
 
     if(!isValidAction(action, player.stack, player.wager, table.getHighestWager(), table.lastRaiseAmount))
     {
@@ -475,7 +482,7 @@ void Game::settleBets(Table& table, Rules& rules)
     }
 
     player.lastAction = action;
-    
+
     int callAmount = table.getCallAmount();
 
     if(action.command == A_RAISE)
@@ -489,10 +496,37 @@ void Game::settleBets(Table& table, Rules& rules)
 
     applyAction(table, action, callAmount);
 
+    for(int cont=0; cont<stats.allPlayers.size(); cont++)
+    {
+      if(stats.allPlayers[cont].name == player.name) {k = cont;}
+    }
+
+    if (action.command == A_FOLD) {i = 0;} // FOLD
+    else if (action.command == A_CHECK) {i = 1; numChecks++;} // CHECK
+    else if (action.command == A_CALL) {i = 2;} // CALL
+    else if (action.command == A_RAISE)
+    {
+      if (player.stack == 0) {i = 5;} // ALL IN
+      else if (table.getCallAmount() == 0 && !(table.round == R_PRE_FLOP && table.dealer == table.current)) {i = 3;} // BET
+      else {i = 4;} //RAISE
+    }
+
+    if (table.round == R_PRE_FLOP) {j = 0;}
+    else if (table.round == R_FLOP) {j = 1;}
+    else if (table.round == R_TURN) {j = 2;}
+    else if (table.round == R_RIVER) {j = 3;}
+
+
+    if (table.round != R_SHOWDOWN && i != -1 && j != -1 && k != -1)
+    {
+      stats.ptrhist[i + j * 6 + k * (6 * 4)] += 1;
+    }
+
     prev_current = table.current;
     table.current = getNextActivePlayer(table.players, table.current);
 
     sendEvents(table);
+
   } //while bets running
 }
 
@@ -540,7 +574,7 @@ void Game::kickOutPlayers(Table& table)
   }
 }
 
-void Game::runTable(Table& table)
+void Game::runTable(Table& table, Stats& stats)
 {
   if(table.players.size() > 10)
   {
@@ -613,7 +647,7 @@ void Game::runTable(Table& table)
       table.current = getInitialPlayer(round, table.dealer, table.players);
 
       if(table.current < 0) continue; //maybe everyone is all-in?
-      settleBets(table, rules);
+      settleBets(table, rules, stats);
 
       if(host->wantToQuit()) { table_running = false; break; }
 
@@ -703,7 +737,7 @@ bool playerGreaterForWin(const Player& a, const Player& b)
 }
 
 
-void Game::declareWinners(Table& table)
+void Game::declareWinners(Table& table, Stats& stats)
 {
   std::vector<Player> playerCopy = table.players;
   std::sort(playerCopy.begin(), playerCopy.end(), playerGreaterForWin);
@@ -732,6 +766,34 @@ void Game::declareWinners(Table& table)
     pos++;
   }
 
+  std::vector<Player> copiaPlayer = table.players;
+  std::sort(copiaPlayer.begin(), copiaPlayer.end(), playerGreaterForWin);
+
+  int posicao;
+  int total = players.size();
+  int out = playersOut.size();
+
+  for (size_t j = 0; j < total; j++)
+  {
+    if (copiaPlayer[0].getName() == players[j].getName() )
+      {
+        stats.ptrstandings[j] = 1;
+        continue;
+      }
+    for(size_t i = 0; i < out; i++)
+    {
+      posicao = players.size()-i;
+      if (playersOut[i].getName() == players[j].getName() )
+      {
+        stats.ptrstandings[j] = posicao;
+      }
+    }
+  }
+
+  playersOut.clear();
+  playerCopy.clear();
+  copiaPlayer.clear();
+
 }
 
 const Info& Game::getInfoForPlayers(Table& table, int viewPoint)
@@ -740,7 +802,7 @@ const Info& Game::getInfoForPlayers(Table& table, int viewPoint)
   return infoForPlayers;
 }
 
-void Game::doGame()
+void Game::doGame(Stats& stats)
 {
   numDeals = 0;
   events.clear();
@@ -752,6 +814,8 @@ void Game::doGame()
   Table table;
   table.players = players;
   table.observers = observers;
+
+  stats.allPlayers = players;
 
   //give each player the buy-in
   for(size_t i = 0; i < players.size(); i++)
@@ -769,12 +833,13 @@ void Game::doGame()
 
   host->onGameBegin(getInfoForPlayers(table));
 
-  runTable(table);
+  runTable(table, stats);
 
-  std::cout << "Game Finished after " << numDeals << " deals." << std::endl;
+  //std::cout << "Game Finished after " << numDeals << " deals." << std::endl;
   //if(!table.players.empty()) std::cout << "Winner: " << table.players[0].getName() << " (AI: " << table.players[0].ai->getAIName() << ")" << std::endl;
+  stats.ptrdeals[0] = numDeals;
 
-  declareWinners(table);
+  declareWinners(table, stats);
 
   sendEvents(table);
 

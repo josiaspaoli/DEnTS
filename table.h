@@ -70,7 +70,7 @@ struct Table
   int getPot() const;
   int getHighestWager() const;
   int getCallAmount() const; //get amount of money required for you to call
-  
+
   int getNumActivePlayers() const; //players that are not folded or out
   int getNumDecidingPlayers() const; //get amount of players that still make decision: players that aren't folded and aren't all-in
 

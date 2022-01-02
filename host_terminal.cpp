@@ -25,6 +25,7 @@ along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 #include "game.h"
 #include "info.h"
 #include "io_terminal.h"
+#include "mex.h"
 #include "statistics.h"
 #include "table.h"
 
@@ -45,28 +46,37 @@ void HostTerminal::onDealDone(const Info& info)
   dealCount++;
   if(human_detected)
   {
-    drawTable(info);
-    
-    if(pressAnyKeyOrQuit()) quit = true;
+    //drawTable(info);
+
+    //if(pressAnyKeyOrQuit()) quit = true;
   }
   else
   {
-    /*if(dealCount % 10 == 0)*/ std::cout << std::endl << "Deal " << dealCount << " done." << std::endl << std::endl;
+    if(dealCount % 50 == 0)
+    {
+        mexPrintf("\n    Partida nº %i terminada.", dealCount);
+        mexEvalString("drawnow;");
+    }
   }
 }
 
 void HostTerminal::onGameBegin(const Info& info)
 {
-  std::cout << std::endl;
-  drawTable(info);
+  if(human_detected)
+  {
+    //std::cout << std::endl;
+    mexPrintf("\n\n");
+    drawTable(info);
+    mexEvalString("drawnow;");
+  }
 }
 
 void HostTerminal::onGameDone(const Info& info)
 {
   (void)info;
 
-  std::cout << std::endl << "Game finished. Press any key to show final events." << std::endl;
-  getChar();
+  //std::cout << std::endl << "Game finished. Press any key to show final events." << std::endl;
+  //getChar();
 }
 
 bool HostTerminal::wantToQuit() const

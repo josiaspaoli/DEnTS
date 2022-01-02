@@ -20,19 +20,38 @@ You should have received a copy of the GNU General Public License
 along with OOPoker.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ai_checkfold.h"
-#include "info.h"
+#pragma once
 
-Action AICheckFold::doTurn(const Info& info, const Stats& stats)
+#include "ai.h"
+#include "matrix.h"
+#include "mex.h"
+
+
+#include <vector>
+
+class AIMyBot : public AI
 {
-  (void)info;
 
-  return info.amountToAction(0);
-}
+  public:
 
+    int ID;
 
+    double *ptrcartas;
+    double *ptrdados;
+    double *ptrestado;
 
-std::string AICheckFold::getAIName()
-{
-  return "CheckFold";
-}
+    mxArray *mae[4];
+    mxArray *cartas;
+    mxArray *dados;
+    mxArray *estado;
+
+    mxArray *p[1];
+
+    AIMyBot(int, int);
+
+    virtual Action doTurn(const Info& info, const Stats& stats);
+
+    virtual std::string getAIName();
+
+};
+

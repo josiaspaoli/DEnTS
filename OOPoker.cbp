@@ -24,6 +24,8 @@
 		<Unit filename="ai_checkfold.h" />
 		<Unit filename="ai_human.cpp" />
 		<Unit filename="ai_human.h" />
+		<Unit filename="ai_my_bot.cpp" />
+		<Unit filename="ai_my_bot.h" />
 		<Unit filename="ai_raise.cpp" />
 		<Unit filename="ai_raise.h" />
 		<Unit filename="ai_random.cpp" />
@@ -76,6 +78,8 @@
 		<Unit filename="rules.h" />
 		<Unit filename="statistics.cpp" />
 		<Unit filename="statistics.h" />
+		<Unit filename="stats.cpp" />
+		<Unit filename="stats.h" />
 		<Unit filename="table.cpp" />
 		<Unit filename="table.h" />
 		<Unit filename="tools_terminal.cpp" />
@@ -87,6 +91,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
