@@ -62,8 +62,9 @@ Tightness é um parâmetro da IA Smart implementada pelo criador do OOPoker que 
 	
 <div align="justify">
 
-As IAs desenvolvidas devem estar em scripts do MATLAB com nomes AI1.m, AI2.m, sucessivamente até AI10.m, que representam as 10 IAs customizadas que podem ser colocadas na mesa. Tenha em mente o fato de, por exemplo, no caso da mesa possuir três IAs personalizadas, serão as IAs contidas nos arquivos IA1, IA2 e IA3, sendo exigido organizá-las quando necessário.
+As IAs desenvolvidas devem estar em scripts do MATLAB com nomes AI1.m, AI2.m, sucessivamente, até AI10.m, que representam as 10 IAs customizadas que podem ser colocadas na mesa. Tenha em mente o fato de, por exemplo, no caso da mesa possuir três IAs personalizadas, serão as IAs contidas nos arquivos IA1, IA2 e IA3, sendo exigido organizá-las quando necessário.
 ATENÇÃO! – Uma vez que a rotina main adiciona todas as pastas e subpastas ao diretório do MATLAB, certifique-se de que cada script criado para sua IA tenha um nome único, independente da pasta onde ele esteja.
+ATENÇÃO! (2) - As IAs atualmente nesse repositório foram as feitas pelo criador, utilizando lógica fuzzy, e são somente uma tentativa de ganhar de BOTs "burros", portanto são IAs, na melhor das hipóteses, ruins.
 
 </div>
 
